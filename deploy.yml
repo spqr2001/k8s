@@ -3,6 +3,7 @@
   - other-master
   - kube-node
   gather_facts: True
+  become: true
   roles:
   - preinstall
   - docker
@@ -10,33 +11,39 @@
 
 - hosts:
   - first-master
+  become: true
   roles:
   - certificates
 
 - hosts:
   - lb-etcd
   gather_facts: True
+  become: true
   roles:
   - etcd
   - keepalived
 
 - hosts:
   - first-master
+  become: true
   roles:
   - first-master
 
 - hosts:
   - other-master
+  become: true
   roles:
   - other-master
 
 - hosts:
   - kube-node
+  become: true
   roles:
   - kube-node
 
 - hosts:
   - first-master
+  become: true
   roles:
   - { role: flannel, when: "network_plugin == 'flannel'" }
   - { role: calico, when: "network_plugin == 'calico'" }
