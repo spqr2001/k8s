@@ -5,12 +5,16 @@
   apt: name={{ item }} state=latest
   with_items:
   - socat
+  - git 
+  - python-pip 
   when: ansible_distribution == "Ubuntu"
      
 - name: Install socat for Centos server
   yum: name={{ item }} state=latest
   with_items:
   - socat
+  - epel-release
+  - python
   when: ansible_distribution == "CentOS"
 
 - name: Disable firewalld on Centos server
