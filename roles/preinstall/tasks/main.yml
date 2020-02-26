@@ -7,15 +7,71 @@
   - socat
   - git 
   - python-pip 
+  - ansible
+  - apt-transport-https 
+  - ca-certificates 
+  - curl 
+  - gnupg-agent 
+  - software-properties-common
   when: ansible_distribution == "Ubuntu"
-     
+
 - name: Install socat for Centos server
   yum: name={{ item }} state=latest
   with_items:
   - socat
   - epel-release
   - python
+  - ansible 
+  - yum-utils 
+  - device-mapper-persistent-data 
+  - lvm2
   when: ansible_distribution == "CentOS"
+
+- name: install the package, force upgrade
+  pip:
+    name: pip
+    executable: pip
+    state: latest
+
+- name: install docker-key 
+  shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  when: ansible_distribution == "Ubuntu" 
+
+- name: Install Docker-Key 
+  get_url:
+    url: https://download.docker.com/linux/ubuntu/gpg 
+    dest: /tmp/gpg_docker
+  when: ansible_distribution == "Ubuntu" 
+
+- name: install docker-key
+  shell: apt-key add /tmp/gpg_docker 
+  when: ansible_distribution == "Ubuntu"
+
+- name: add docker repo 
+  shell: sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+  when: ansible_distribution == "Ubuntu" 
+
+
+- name: Remove old Docker 
+  apt: name={{ item }} state=absent
+  with_items:
+  - docker 
+  - docker-client 
+  - docker-client-latest 
+  - docker-common 
+  - docker-latest 
+  - docker-latest-logrotate 
+  - docker-logrotate 
+  - docker-engine
+  when: ansible_distribution == "Centos"
+
+- name: Add Docker repository
+  yum_repository:
+    name: docker ce repor  
+    description: docker-ce repo
+    baseurl:  https://download.docker.com/linux/centos/docker-ce.repo 
+  when: ansible_distribution == "Centos" 
+
 
 - name: Disable firewalld on Centos server
   service: name=firewalld state=stopped enabled=no

@@ -2,9 +2,9 @@
   "CN": "etcd",
   "hosts": [
     "127.0.0.1",
+    "{{ master00 }}",
     "{{ master01 }}",
-    "{{ master02 }}",
-    "{{ master03 }}"
+    "{{ master02 }}"
   ],
   "key": {
     "algo": "rsa",
@@ -12,9 +12,9 @@
   },
   "names": [
     {
-      "C": "US",
-      "ST": "TX",
-      "L": "dallas",
+      "C": "GE",
+      "ST": "RLP",
+      "L": "Kaiserslautern",
       "O": "k8s",
       "OU": "System"
     }
