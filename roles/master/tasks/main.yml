@@ -15,9 +15,9 @@
 
 - name: Copying required files
   shell: |
-   mkdir -p $HOME/.kube
-   sudo cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
-   sudo chown $(id -u):$(id -g) $HOME/.kube/config
+   mkdir -p {{ansible_user}}/.kube
+   sudo cp -f /etc/kubernetes/admin.conf /home/{{ansible_user}}/.kube/config
+   sudo chown {{ansible_user}}:{{ansible_user}} {{ansible_user}}/.kube/config
 
 - name: Install Network Add-on
   command: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml

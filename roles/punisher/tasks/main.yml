@@ -22,6 +22,14 @@
 #    volumes: yes
 #    builder_cache: yes
 
+- name: remove dirs
+  file: 
+   path: "{{item}}" 
+   state: absent
+  loop: 
+   - /etc/kubernetes
+   - /home/hal9000/.kube
+
 - name: Remove old Docker
   yum: name={{ item }} state=absent
   loop:
