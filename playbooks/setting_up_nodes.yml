@@ -2,6 +2,15 @@
 - hosts: all
   become: true
   tasks:
+  - name: Disabling Swap on all nodes
+    shell: /sbin/swapoff -a
+
+  - name: Commenting Swap entries in /etc/fstab
+    replace:
+     path: /etc/fstab
+     regexp: '(.*swap*)'
+     replace: '#\1'
+
   - name: Creating a repository file for Kubernetes
     file:
      path: /etc/yum.repos.d/kubernetes.repo
