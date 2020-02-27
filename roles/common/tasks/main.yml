@@ -8,8 +8,6 @@
    regexp: '(.*swap*)'
    replace: '#\1'
 
-- name: make dir 
-  shell: mkdir -p /home/hal9000/.kube
 
 - name: Remove old Docker
   yum: name={{ item }} state=absent
