@@ -1,2 +1,6 @@
 ---
-- import_playbook: playbooks/punisher.yml
+- hosts: all 
+  become: true
+  roles: 
+    - punisher 
+
