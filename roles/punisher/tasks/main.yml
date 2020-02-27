@@ -12,17 +12,33 @@
    rm -rf /var/lib/docker/*
    rm -rf /etc/kubernetes
 
-- name: remove yum packages
-  yum:
-   name: "{{item}}"
-   state: absent
-   with_items:
-    - kubelet
-    - kubeadm
-    - kubectl
-    - docker-ce
-    - device-mapper-persistent-data
-  ignore_errors: true
+- name: Prune everything (including non-dangling images)
+  docker_prune:
+    containers: yes
+    images: yes
+    images_filters:
+      dangling: false
+    networks: yes
+    volumes: yes
+    builder_cache: yes
+
+- name: Remove old Docker
+  yum: name={{ item }} state=absent
+  loop:
+   - docker
+   - docker-client
+   - docker-client-latest
+   - docker-common
+   - docker-latest
+   - docker-latest-logrotate
+   - docker-logrotate
+   - docker-engine
+   - kubelet
+   - kubeadm
+   - kubectl
+   - docker-ce
+   - device-mapper-persistent-data
+  
 
 - name: Remove docker-ce-stable repo
   yum_repository:

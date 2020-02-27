@@ -8,36 +8,54 @@
    regexp: '(.*swap*)'
    replace: '#\1'
 
-- name: Creating a repository file for Kubernetes
-  file:
-   path: /etc/yum.repos.d/kubernetes.repo
-   state: touch
+- name: Remove old Docker
+  yum: name={{ item }} state=absent
+  loop:
+   - docker
+   - docker-client
+   - docker-client-latest
+   - docker-common
+   - docker-latest
+   - docker-latest-logrotate
+   - docker-logrotate
+   - docker-engine
 
-- name: Adding repository details in Kubernetes repo file.
-  blockinfile:
-   path: /etc/yum.repos.d/kubernetes.repo
-   block: |
-    [kubernetes]
-    name=Kubernetes
-    baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
-    enabled=1
-    gpgcheck=1
-    repo_gpgcheck=1
-    gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
-    https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+- name: add repo
+  shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 
-- name: Installing Docker and firewalld
-  shell: |
-   yum install firewalld -y
-   yum install -y yum-utils device-mapper-persistent-data lvm2
-   yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-   yum install docker-ce -y
+- name: Centos Docker CE
+  yum: name={{ item }} state=latest
+  with_items:
+   - docker-ce
+   - docker-ce-cli
+   - containerd.io
+
+- name: Start docker service
+  shell: systemctl daemon-reload && systemctl enable docker && systemctl restart docker
+
+- name: adding existing user "{{ ansible_user }}" to group sudo
+  user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: yes
+  become: yes
+
+- name: Add kubernetes repo
+  yum_repository:
+    name: kubernetes
+    description: Kubernetes repo
+    baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+    gpgcheck: no
+    sslverify: no
+    enabled: true
+
+
 
 - name: Installing required packages
   yum:
    name: "{{ item }}"
    state: present
-  with_items: "{{ packages }}"
+  loop: "{{ packages }}"
 
 - name: Starting and Enabling the required services
   service:
@@ -45,13 +63,6 @@
    state: started
    enabled: yes
   with_items: "{{ services }}"
-
-- name: Enable firewalld service
-  systemd:
-    state: restarted
-    daemon_reload: yes
-    name: firewalld
-    enabled: yes
 
 - name: Open ports
   firewalld:
