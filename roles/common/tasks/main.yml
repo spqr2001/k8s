@@ -20,7 +20,10 @@
    - docker-logrotate
    - docker-engine
 
-- name: add repo
+- name: install epel 
+  shell: yum install epel-release -y 
+
+- name: add docker repo
   shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 
 - name: Add kubernetes repo

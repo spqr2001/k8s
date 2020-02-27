@@ -9,7 +9,10 @@ packages:
 - docker-ce
 - docker-ce-cli
 - containerd.io
-
+- ansible 
+- htop 
+- nload 
+- git 
 
 services:
 - docker
