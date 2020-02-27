@@ -8,6 +8,9 @@
    regexp: '(.*swap*)'
    replace: '#\1'
 
+- name: add user to docker
+  shell: usermod -aG docker {{ ansible_user }}
+
 
 - name: Remove old Docker
   yum: name={{ item }} state=absent
