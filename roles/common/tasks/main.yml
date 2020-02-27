@@ -20,13 +20,13 @@
    - docker-logrotate
    - docker-engine
 
-- name: install epel 
-  shell: yum install epel-release -y 
+- name: install epel repo
+  yum: name=epel-release state=present 
 
 - name: add docker repo
   shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 
-- name: Add kubernetes repo
+- name: add kubernetes repo
   yum_repository:
     name: kubernetes
     description: Kubernetes repo
@@ -38,8 +38,8 @@
 - name: update 
   yum: name=* state=latest
 
-- name: Centos Docker CE
-  yum: name={{ item }} state=latest
+- name: install docker and other dependencies  
+  yum: name={{ item }} state=present
   loop:
    - "{{ packages }}"
 
@@ -54,23 +54,6 @@
     append: yes
   become: yes
 
-- name: Add kubernetes repo
-  yum_repository:
-    name: kubernetes
-    description: Kubernetes repo
-    baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
-    gpgcheck: no
-    sslverify: no
-    enabled: true
-
-
-
-- name: Installing required packages
-  yum:
-   name: "{{ item }}"
-   state: present
-  loop: "{{ packages }}"
-
 - name: Starting and Enabling the required services
   service:
    name: "{{ item }}"
@@ -78,7 +61,7 @@
    enabled: yes
   loop: "{{ services }}"
 
-- name: Open ports
+- name: open ports
   firewalld:
     port: "{{item}}"
     permanent: true
@@ -110,9 +93,9 @@
 - name: Enable IP masquerading
   shell: "firewall-cmd --permanent --zone={{ network_zone }} --add-masquerade"
 
-- name: Reload firewalld
+- name: reload firewalld
   shell: firewall-cmd --reload
 
-- name: Enabling Bridge Firewall Rule
+- name: enabling bridge firewall rule
   shell: "echo '1' > /proc/sys/net/bridge/bridge-nf-call-iptables"
 
