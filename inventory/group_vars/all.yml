@@ -6,6 +6,10 @@ network_zone: public
 packages:
 - kubeadm
 - kubectl
+- docker-ce
+- docker-ce-cli
+- containerd.io
+
 
 services:
 - docker

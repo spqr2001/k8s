@@ -23,12 +23,23 @@
 - name: add repo
   shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 
+- name: Add kubernetes repo
+  yum_repository:
+    name: kubernetes
+    description: Kubernetes repo
+    baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+    gpgcheck: no
+    sslverify: no
+    enabled: true
+
+- name: update 
+  yum: name=* state=latest
+
 - name: Centos Docker CE
   yum: name={{ item }} state=latest
-  with_items:
-   - docker-ce
-   - docker-ce-cli
-   - containerd.io
+  loop:
+   - "{{ packages }}"
+
 
 - name: Start docker service
   shell: systemctl daemon-reload && systemctl enable docker && systemctl restart docker
@@ -62,14 +73,14 @@
    name: "{{ item }}"
    state: started
    enabled: yes
-  with_items: "{{ services }}"
+  loop: "{{ services }}"
 
 - name: Open ports
   firewalld:
     port: "{{item}}"
     permanent: true
     state: enabled
-  with_items:
+  loop:
     - 6443/tcp
     - 5443/tcp
     - 2379-2380/tcp
