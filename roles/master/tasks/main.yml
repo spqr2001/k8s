@@ -12,7 +12,6 @@
 
 - name: Storing Logs and Generated token for future purpose.
   local_action: copy content={{ output.stdout }} dest=/home/{{ ansible_user }}/{{ token_file }}
-  ignore_errors: true
 
 - name: Copying required files
   shell: |
