@@ -11,6 +11,17 @@
 - name: add user to docker
   shell: usermod -aG docker {{ ansible_user }}
 
+- name: Modify sysctl entries
+  sysctl:
+    name: '{{ item.key }}'
+    value: '{{ item.value }}'
+    sysctl_set: yes
+    state: present
+  loop:
+    - {key: net.bridge.bridge-nf-call-ip6tables, value: 1}
+    - {key: net.bridge.bridge-nf-call-iptables,  value: 1}
+    - {key: net.ipv4.ip_forward,  value: 1}
+
 
 - name: Remove old Docker
   yum: name={{ item }} state=absent
